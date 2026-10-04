@@ -1,0 +1,20 @@
+// src/middlewares/auth.middleware.js
+import jwt from 'jsonwebtoken';
+
+export const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader) {
+    return res.status(401).json({ success: false, message: "No token provided bro!" });
+  }
+
+  const token = authHeader.split(' ')[1];
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key');
+    req.user = decoded; // រក្សាទុក info user (មានទាំង role_id) សម្រាប់ប្រើប្រាស់បន្ត
+    next();
+  } catch (error) {
+    return res.status(403).json({ success: false, message: "Invalid or expired token bro!" });
+  }
+};
